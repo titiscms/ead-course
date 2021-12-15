@@ -29,7 +29,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Transactional
     @Override
-    public void delele(CourseModel courseModel) {
+    public void delete(CourseModel courseModel) {
         List<ModuleModel> moduleModelList = moduleRepository.findAllModulesIntoCourse(courseModel.getCourseId());
         if (!moduleModelList.isEmpty()) {
             for (ModuleModel moduleModel : moduleModelList) {

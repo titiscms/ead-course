@@ -39,7 +39,7 @@ public class CourseController {
         if (courseModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found.");
         }
-        courseService.delele(courseModelOptional.get());
+        courseService.delete(courseModelOptional.get());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Course deleted successfully!");
     }
 
