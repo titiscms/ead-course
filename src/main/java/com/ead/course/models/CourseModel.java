@@ -29,7 +29,7 @@ public class CourseModel implements Serializable {
     @Column(nullable = false, length = 150)
     private String name;
     @Column(nullable = false, length = 250)
-    private String descrption;
+    private String description;
     @Column
     private String imageUrl;
     @Column(nullable = false)
