@@ -1,8 +1,6 @@
 package com.ead.course.controllers;
 
-import com.ead.course.dtos.CourseDto;
 import com.ead.course.dtos.ModuleDto;
-import com.ead.course.models.CourseModel;
 import com.ead.course.models.ModuleModel;
 import com.ead.course.services.CourseService;
 import com.ead.course.services.ModuleService;
@@ -16,7 +14,6 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
