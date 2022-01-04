@@ -11,7 +11,6 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 import java.util.Collection;
 import java.util.UUID;
@@ -22,19 +21,19 @@ public class SpecificationTemplate {
             @Spec(path = "courseLevel", spec = Equal.class),
             @Spec(path = "courseStatus", spec = Equal.class),
             @Spec(path = "name", spec = LikeIgnoreCase.class),
-            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="dd-MM-yyyy HH:mm:ss")
+            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="yyyy-MM-dd'T'HH:mm:ss'Z'")
     })
     public interface CourseSpec extends Specification<CourseModel> { }
 
     @And({
             @Spec(path = "title", spec = LikeIgnoreCase.class),
-            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="dd-MM-yyyy HH:mm:ss")
+            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="yyyy-MM-dd'T'HH:mm:ss'Z'")
     })
     public interface ModuleSpec extends Specification<ModuleModel> { }
 
     @And({
             @Spec(path = "title", spec = LikeIgnoreCase.class),
-            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="dd-MM-yyyy HH:mm:ss")
+            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="yyyy-MM-dd'T'HH:mm:ss'Z'")
     })
     public interface LessonSpec extends Specification<LessonModel> { }
 
