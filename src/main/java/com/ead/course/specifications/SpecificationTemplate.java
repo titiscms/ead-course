@@ -26,10 +26,16 @@ public class SpecificationTemplate {
     })
     public interface CourseSpec extends Specification<CourseModel> { }
 
-    @Spec(path = "title", spec = LikeIgnoreCase.class)
+    @And({
+            @Spec(path = "title", spec = LikeIgnoreCase.class),
+            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="dd-MM-yyyy HH:mm:ss")
+    })
     public interface ModuleSpec extends Specification<ModuleModel> { }
 
-    @Spec(path = "title", spec = LikeIgnoreCase.class)
+    @And({
+            @Spec(path = "title", spec = LikeIgnoreCase.class),
+            @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="dd-MM-yyyy HH:mm:ss")
+    })
     public interface LessonSpec extends Specification<LessonModel> { }
 
     public static Specification<ModuleModel> moduleCourseId(final UUID courseId) {
@@ -54,9 +60,9 @@ public class SpecificationTemplate {
             // Entity B
             Root<ModuleModel> moduleModelRoot = query.from(ModuleModel.class);
             // Collection from Entity A into Entity B
-            Expression<Collection<LessonModel>> moduleModules = moduleModelRoot.get("lessons");
+            Expression<Collection<LessonModel>> moduleLessons = moduleModelRoot.get("lessons");
             // It was used AND type to built CriteriaBuilder to return data of lessons from moduleId
-            return criteriaBuilder.and(criteriaBuilder.equal(moduleModelRoot.get("moduleId"), moduleId), criteriaBuilder.isMember(lessonModelRoot, moduleModules));
+            return criteriaBuilder.and(criteriaBuilder.equal(moduleModelRoot.get("moduleId"), moduleId), criteriaBuilder.isMember(lessonModelRoot, moduleLessons));
         });
     }
 
