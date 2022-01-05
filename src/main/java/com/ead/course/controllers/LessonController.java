@@ -5,6 +5,7 @@ import com.ead.course.models.LessonModel;
 import com.ead.course.services.LessonService;
 import com.ead.course.services.ModuleService;
 import com.ead.course.specifications.SpecificationTemplate;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,11 +21,13 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
+@Log4j2
 @RestController
 @RequestMapping(path = "/modules/{moduleId}/lessons")
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class LessonController {
 
+    public static final String MSG_LESSON_NOT_FOUND_FOR_THIS_MODULE = "Lesson not found for this module.";
     @Autowired
     private LessonService lessonService;
 
@@ -33,6 +36,7 @@ public class LessonController {
 
     @PostMapping
     public ResponseEntity<Object> saveLesson(@PathVariable UUID moduleId, @Valid @RequestBody LessonDto lessonDto) {
+        log.debug("POST saveLesson lessonDto received {} ", lessonDto.toString());
         var moduleModelOptional = moduleService.findById(moduleId);
         if (moduleModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Module not found.");
@@ -42,28 +46,36 @@ public class LessonController {
         lessonModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
         lessonModel.setModule(moduleModelOptional.get());
         LessonModel lessonModelSaved = lessonService.save(lessonModel);
+        log.debug("POST saveLesson lessonModel saved {} ", lessonModelSaved.toString());
+        log.info("Lesson saved successfully lessonId {}", lessonModelSaved.getLessonId());
         return ResponseEntity.status(HttpStatus.CREATED).body(lessonModelSaved);
     }
 
     @DeleteMapping(path = "/{lessonId}")
     public ResponseEntity<Object> deleteLesson(@PathVariable UUID moduleId, @PathVariable UUID lessonId) {
+        log.debug("DELETE deleteLesson lessonId received {} ", lessonId);
         var lessonModelOptional = lessonService.findLessonIntoModule(moduleId, lessonId);
         if (lessonModelOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found for this module.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MSG_LESSON_NOT_FOUND_FOR_THIS_MODULE);
         }
         lessonService.delete(lessonModelOptional.get());
+        log.debug("DELETE deleteLesson lessonId deleted {} ", lessonId);
+        log.info("Lesson deleted successfully lessonId {}", lessonId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Lesson deleted successfully!");
     }
 
     @PutMapping(path = "/{lessonId}")
     public ResponseEntity<Object> updateLesson(@PathVariable UUID moduleId, @PathVariable UUID lessonId, @Valid @RequestBody LessonDto lessonDto) {
+        log.debug("PUT updateCourse lessonDto {} + lessonId {} received ", lessonDto.toString(), lessonId);
         var lessonModelOptional = lessonService.findLessonIntoModule(moduleId, lessonId);
         if (lessonModelOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found for this module.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MSG_LESSON_NOT_FOUND_FOR_THIS_MODULE);
         }
         var lessonModelUpdate = lessonModelOptional.get();
         BeanUtils.copyProperties(lessonDto, lessonModelUpdate);
         LessonModel lessonModelSaved = lessonService.save(lessonModelUpdate);
+        log.debug("PUT updateLesson lessonModel updated {} ", lessonModelSaved.toString());
+        log.info("Lesson updated successfully lessonId {}", lessonModelSaved.getLessonId());
         return ResponseEntity.status(HttpStatus.OK).body(lessonModelSaved);
     }
 
@@ -77,10 +89,12 @@ public class LessonController {
 
     @GetMapping(path = "/{lessonId}")
     public ResponseEntity<Object> getOneLessonForOneModule(@PathVariable UUID moduleId, @PathVariable UUID lessonId) {
+        log.debug("GET getOneLessonForOneModule lessonId received {} ", lessonId);
         var lessonModelOptional = lessonService.findLessonIntoModule(moduleId, lessonId);
         if (lessonModelOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lesson not found for this module.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MSG_LESSON_NOT_FOUND_FOR_THIS_MODULE);
         }
+        log.debug("GET getOneLessonForOneModule lessonModel retrieved {} ", lessonModelOptional.get().toString());
         return ResponseEntity.status(HttpStatus.OK).body(lessonModelOptional.get());
     }
 }
