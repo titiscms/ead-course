@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Log4j2
 @RestController
 @RequestMapping(path = "/courses")
@@ -38,7 +41,7 @@ public class CourseController {
         courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
         courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
         CourseModel courseModelSaved = courseService.save(courseModel);
-        log.debug("POST saveCourse courseModel saved {} ", courseModelSaved.toString());
+        log.debug("POST saveCourse courseId saved {} ", courseModelSaved.getCourseId());
         log.info("Course saved successfully courseId {}", courseModelSaved.getCourseId());
         return ResponseEntity.status(HttpStatus.CREATED).body(courseModelSaved);
     }
@@ -67,15 +70,26 @@ public class CourseController {
         BeanUtils.copyProperties(courseDto, courseModelUpdate);
         courseModelUpdate.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
         CourseModel courseModelSaved = courseService.save(courseModelUpdate);
-        log.debug("PUT updateCourse courseModel updated {} ", courseModelSaved.toString());
+        log.debug("PUT updateCourse courseId updated {} ", courseModelSaved.getCourseId());
         log.info("Course updated successfully courseId {}", courseModelSaved.getCourseId());
         return ResponseEntity.status(HttpStatus.OK).body(courseModelSaved);
     }
 
     @GetMapping
     public ResponseEntity<Page<CourseModel>> getAllCourses(SpecificationTemplate.CourseSpec spec,
-                                                           @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable pageable) {
-        Page<CourseModel> courseModelPage = courseService.findAll(spec, pageable);
+                                                           @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable pageable,
+                                                           @RequestParam(required = false) UUID userId) {
+        Page<CourseModel> courseModelPage;
+        if (userId != null) {
+            courseModelPage = courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), pageable);
+        } else {
+            courseModelPage = courseService.findAll(spec, pageable);
+        }
+        if (!courseModelPage.isEmpty()) {
+            for (CourseModel courseModel : courseModelPage.toList()) {
+                courseModel.add(linkTo(methodOn(CourseController.class).getOneCourse(courseModel.getCourseId())).withSelfRel());
+            }
+        }
         return ResponseEntity.status(HttpStatus.OK).body(courseModelPage);
     }
 
@@ -86,7 +100,7 @@ public class CourseController {
         if (courseModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MSG_COURSE_NOT_FOUND);
         }
-        log.debug("GET getOneCourse courseDto retrieved {} ", courseModelOptional.get().toString());
+        log.debug("GET getOneCourse courseId retrieved {} ", courseModelOptional.get().getCourseId());
         return ResponseEntity.status(HttpStatus.OK).body(courseModelOptional.get());
     }
 }
