@@ -1,5 +1,6 @@
 package com.ead.course.services.impl;
 
+import com.ead.course.clients.AuthuserClient;
 import com.ead.course.models.CourseModel;
 import com.ead.course.models.CourseUserModel;
 import com.ead.course.repositories.CourseUserRepository;
@@ -16,6 +17,9 @@ public class CourseUserServiceImpl implements CourseUserService {
     @Autowired
     private CourseUserRepository courseUserRepository;
 
+    @Autowired
+    private AuthuserClient authuserClient;
+
     @Override
     public boolean existsByCourseAndUserId(CourseModel courseModel, UUID userId) {
         return courseUserRepository.existsByCourseAndUserId(courseModel, userId);
@@ -25,5 +29,13 @@ public class CourseUserServiceImpl implements CourseUserService {
     @Override
     public CourseUserModel save(CourseUserModel courseUserModel) {
         return courseUserRepository.save(courseUserModel);
+    }
+
+    @Transactional
+    @Override
+    public CourseUserModel saveAndSendSubscriptionUserInCourse(CourseUserModel courseUserModel) {
+        courseUserModel = courseUserRepository.save(courseUserModel);
+        authuserClient.postSubscriptionUserInCourse(courseUserModel.getCourse().getCourseId(), courseUserModel.getUserId());
+        return courseUserModel;
     }
 }

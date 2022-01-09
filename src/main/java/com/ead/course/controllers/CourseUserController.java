@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.UnknownHttpStatusCodeException;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -71,8 +70,8 @@ public class CourseUserController {
             }
             log.error("Could not retrieve user userId {} ", subscriptionDto.getUserId(), e);
         }
-        CourseUserModel courseUserModelSaved = courseUserService.save(courseModelOptional.get().convertToCourseUserModel(subscriptionDto.getUserId()));
-        log.debug("POST saveSubscriptionUserInCourse courseUserId saved {} ", courseUserModelSaved.getUserId());
+        CourseUserModel courseUserModelSaved = courseUserService.saveAndSendSubscriptionUserInCourse(courseModelOptional.get().convertToCourseUserModel(subscriptionDto.getUserId()));
+        log.debug("POST saveSubscriptionUserInCourse userId saved {} ", courseUserModelSaved.getUserId());
         log.info("Subscription created successfully userId {}", courseUserModelSaved.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(courseUserModelSaved);
     }

@@ -9,4 +9,6 @@ public interface UtilsService {
     String getUrlGetAllUsersByCourse(UUID courseId, Pageable pageable);
 
     String getUrlGetUserById(UUID userId);
+
+    String getUrlPostUserCourseSubscription(UUID userId);
 }

@@ -1,7 +1,9 @@
 package com.ead.course.clients;
 
 import com.ead.course.dtos.ResponsePageDto;
+import com.ead.course.dtos.UserCourseDto;
 import com.ead.course.dtos.UserDto;
+import com.ead.course.models.CourseUserModel;
 import com.ead.course.services.UtilsService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,4 +59,14 @@ public class AuthuserClient {
         return restTemplate.exchange(url, HttpMethod.GET, null, UserDto.class);
     }
 
+    public void postSubscriptionUserInCourse(UUID courseId, UUID userId) {
+        String url = REQUEST_URL_AUTHUSER + utilsService.getUrlPostUserCourseSubscription(userId);
+        log.debug("Request URL: {} ", url);
+        log.info("Request URL: {} ", url);
+        var userCourseDto = new UserCourseDto();
+        userCourseDto.setCourseId(courseId);
+        userCourseDto.setUserId(userId);
+        log.debug("UserCourseDto : {} ", userCourseDto.toString());
+        restTemplate.postForEntity(url, userCourseDto, String.class);
+    }
 }
