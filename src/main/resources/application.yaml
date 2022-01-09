@@ -25,3 +25,8 @@ logging:
     root: info
     org.springframework.web: debug
     org.hibernate: info
+
+ead:
+  api:
+    url:
+      authuser: 'http://localhost:8081'
