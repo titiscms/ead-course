@@ -11,4 +11,6 @@ public interface UtilsService {
     String getUrlGetUserById(UUID userId);
 
     String getUrlPostUserCourseSubscription(UUID userId);
+
+    String getUrlDeleteCourseInAuthuser(UUID courseId);
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.validation.Valid;
+import javax.ws.rs.core.Response;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,9 +40,15 @@ public class CourseUserController {
     private CourseUserService courseUserService;
 
     @GetMapping
-    public ResponseEntity<Page<UserDto>> getAllUsersByCourse(@PathVariable UUID courseId,
+    public ResponseEntity<Object> getAllUsersByCourse(@PathVariable UUID courseId,
                                                              @PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.ASC)Pageable pageable) {
+        log.debug("GET getAllUsersByCourse courseId received {} ", courseId);
+        Optional<CourseModel> courseModelOptional = courseService.findById(courseId);
+        if (courseModelOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found.");
+        }
         Page<UserDto> getAllUsersByCoursePage = authuserClient.getAllUsersByCourse(courseId, pageable);
+        log.debug("GET getAllUsersByCourse totalElements {} ", getAllUsersByCoursePage.getTotalElements());
         return ResponseEntity.status(HttpStatus.OK).body(getAllUsersByCoursePage);
     }
 
