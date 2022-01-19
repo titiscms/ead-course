@@ -20,14 +20,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.validation.Valid;
-import javax.ws.rs.core.Response;
 import java.util.Optional;
 import java.util.UUID;
 
 @Log4j2
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping(path = "/courses/{courseId}/users")
+@RequestMapping(path = "/courses")
 public class CourseUserController {
 
     @Autowired
@@ -39,7 +38,7 @@ public class CourseUserController {
     @Autowired
     private CourseUserService courseUserService;
 
-    @GetMapping
+    @GetMapping(path = "/{courseId}/users")
     public ResponseEntity<Object> getAllUsersByCourse(@PathVariable UUID courseId,
                                                              @PageableDefault(page = 0, size = 10, sort = "userId", direction = Sort.Direction.ASC)Pageable pageable) {
         log.debug("GET getAllUsersByCourse courseId received {} ", courseId);
@@ -52,7 +51,7 @@ public class CourseUserController {
         return ResponseEntity.status(HttpStatus.OK).body(getAllUsersByCoursePage);
     }
 
-    @PostMapping(path = "/subscription")
+    @PostMapping(path = "/{courseId}/users/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable UUID courseId,
                                                                @RequestBody @Valid SubscriptionDto subscriptionDto) {
         log.debug("POST saveSubscriptionUserInCourse subscriptionDto received {} ", subscriptionDto.toString());
@@ -82,4 +81,17 @@ public class CourseUserController {
         log.info("Subscription created successfully userId {}", courseUserModelSaved.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(courseUserModelSaved);
     }
+
+    @DeleteMapping(path = "/users/{userId}")
+    public ResponseEntity<Object> deleteCourseUserByUser(@PathVariable UUID userId) {
+        log.debug("DELETE deleteCourseUserByUser courseUserId received {} ", userId);
+        if (!courseUserService.existsByUserId(userId)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("CourseUser not found.");
+        }
+        courseUserService.deleteCourseUserByUser(userId);
+        log.debug("DELETE deleteCourseUserByUser userId deleted {} ", userId);
+        log.info("CourseUser deleted successfully userId {}", userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("CourseUser deleted successfully.");
+    }
+
 }
