@@ -88,7 +88,12 @@ public class CourseController {
     public ResponseEntity<Page<CourseModel>> getAllCourses(SpecificationTemplate.CourseSpec spec,
                                                            @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable pageable,
                                                            @RequestParam(required = false) UUID userId) {
-        Page<CourseModel> courseModelPage = courseService.findAll(spec, pageable);
+        Page<CourseModel> courseModelPage;
+        if (userId != null) {
+            courseModelPage = courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), pageable);
+        } else {
+            courseModelPage = courseService.findAll(spec, pageable);
+        }
         if (!courseModelPage.isEmpty()) {
             for (CourseModel courseModel : courseModelPage.toList()) {
                 courseModel.add(linkTo(methodOn(CourseController.class).getOneCourse(courseModel.getCourseId())).withSelfRel());
