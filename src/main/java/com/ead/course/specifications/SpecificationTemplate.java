@@ -1,9 +1,9 @@
 package com.ead.course.specifications;
 
 import com.ead.course.models.CourseModel;
-import com.ead.course.models.CourseUserModel;
 import com.ead.course.models.LessonModel;
 import com.ead.course.models.ModuleModel;
+import com.ead.course.models.UserModel;
 import net.kaczmarzyk.spring.data.jpa.domain.Between;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
@@ -12,7 +12,6 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
 import java.util.Collection;
 import java.util.UUID;
@@ -26,6 +25,14 @@ public class SpecificationTemplate {
             @Spec(path="creationDate", params={"createdAfter","createdBefore"}, spec=Between.class, config="yyyy-MM-dd'T'HH:mm:ss'Z'")
     })
     public interface CourseSpec extends Specification<CourseModel> { }
+
+    @And({
+            @Spec(path = "userType", spec = Equal.class),
+            @Spec(path = "userStatus", spec = Equal.class),
+            @Spec(path = "email", spec = LikeIgnoreCase.class),
+            @Spec(path = "fullName", spec = LikeIgnoreCase.class)
+    })
+    public interface UserSpec extends Specification<UserModel> { }
 
     @And({
             @Spec(path = "title", spec = LikeIgnoreCase.class),
@@ -67,12 +74,31 @@ public class SpecificationTemplate {
         });
     }
 
-    public static Specification<CourseModel> courseUserId(final UUID userId) {
+    public static Specification<UserModel> userCourseId(final UUID courseId) {
         return ((root, query, criteriaBuilder) -> {
             query.distinct(true);
-            Join<CourseModel, CourseUserModel> courseProd = root.join("coursesUsers");
-            return criteriaBuilder.equal(courseProd.get("userId"), userId);
+            // Entity A
+            Root<UserModel> userModelRoot = root;
+            // Entity B
+            Root<CourseModel> courseModelRoot = query.from(CourseModel.class);
+            // Collection from Entity A into Entity B
+            Expression<Collection<UserModel>> courseUsers = courseModelRoot.get("users");
+            // It was used AND type to built CriteriaBuilder to return data of users from courseId
+            return criteriaBuilder.and(criteriaBuilder.equal(courseModelRoot.get("courseId"), courseId), criteriaBuilder.isMember(userModelRoot, courseUsers));
         });
     }
 
+    public static Specification<CourseModel> courseUserId(final UUID userId) {
+        return ((root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            // Entity A
+            Root<CourseModel> courseModelRoot = root;
+            // Entity B
+            Root<UserModel> userModelRoot = query.from(UserModel.class);
+            // Collection from Entity A into Entity B
+            Expression<Collection<CourseModel>> userCourses = userModelRoot.get("courses");
+            // It was used AND type to built CriteriaBuilder to return data of users from courseId
+            return criteriaBuilder.and(criteriaBuilder.equal(courseModelRoot.get("userId"), userId), criteriaBuilder.isMember(courseModelRoot, userCourses));
+        });
+    }
 }
