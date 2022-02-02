@@ -98,7 +98,7 @@ public class SpecificationTemplate {
             // Collection from Entity A into Entity B
             Expression<Collection<CourseModel>> userCourses = userModelRoot.get("courses");
             // It was used AND type to built CriteriaBuilder to return data of users from courseId
-            return criteriaBuilder.and(criteriaBuilder.equal(courseModelRoot.get("userId"), userId), criteriaBuilder.isMember(courseModelRoot, userCourses));
+            return criteriaBuilder.and(criteriaBuilder.equal(userModelRoot.get("userId"), userId), criteriaBuilder.isMember(courseModelRoot, userCourses));
         });
     }
 }
