@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,5 +27,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel save(UserModel userModel) {
         return userRepository.save(userModel);
+    }
+
+    @Transactional
+    @Override
+    public void delete(UUID userId) {
+        userRepository.deleteById(userId);
     }
 }
