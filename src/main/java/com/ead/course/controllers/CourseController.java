@@ -50,7 +50,7 @@ public class CourseController {
         courseModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
         courseModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
         CourseModel courseModelSaved = courseService.save(courseModel);
-        log.debug("POST saveCourse courseId saved {} ", courseModelSaved.getCourseId());
+        log.debug("POST saveCourse courseId {} ", courseModelSaved.getCourseId());
         log.info("Course saved successfully courseId {}", courseModelSaved.getCourseId());
         return ResponseEntity.status(HttpStatus.CREATED).body(courseModelSaved);
     }
@@ -79,7 +79,7 @@ public class CourseController {
         BeanUtils.copyProperties(courseDto, courseModelUpdate);
         courseModelUpdate.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
         CourseModel courseModelSaved = courseService.save(courseModelUpdate);
-        log.debug("PUT updateCourse courseId updated {} ", courseModelSaved.getCourseId());
+        log.debug("PUT updateCourse courseId {} ", courseModelSaved.getCourseId());
         log.info("Course updated successfully courseId {}", courseModelSaved.getCourseId());
         return ResponseEntity.status(HttpStatus.OK).body(courseModelSaved);
     }
@@ -109,7 +109,7 @@ public class CourseController {
         if (courseModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MSG_COURSE_NOT_FOUND);
         }
-        log.debug("GET getOneCourse courseId retrieved {} ", courseModelOptional.get().getCourseId());
+        log.debug("GET getOneCourse courseId {} ", courseModelOptional.get().getCourseId());
         return ResponseEntity.status(HttpStatus.OK).body(courseModelOptional.get());
     }
 }

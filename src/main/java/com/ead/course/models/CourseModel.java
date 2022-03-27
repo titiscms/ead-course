@@ -48,9 +48,9 @@ public class CourseModel extends RepresentationModel<CourseModel> implements Ser
     @Column(nullable = false)
     private UUID userInstructor;
 
-    @Fetch(FetchMode.SUBSELECT)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
+    @Fetch(FetchMode.SUBSELECT)
     private Set<ModuleModel> modules;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

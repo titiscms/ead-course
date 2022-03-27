@@ -46,7 +46,7 @@ public class LessonController {
         lessonModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
         lessonModel.setModule(moduleModelOptional.get());
         LessonModel lessonModelSaved = lessonService.save(lessonModel);
-        log.debug("POST saveLesson lessonModel saved {} ", lessonModelSaved.toString());
+        log.debug("POST saveLesson lessonId {} ", lessonModelSaved.getLessonId());
         log.info("Lesson saved successfully lessonId {}", lessonModelSaved.getLessonId());
         return ResponseEntity.status(HttpStatus.CREATED).body(lessonModelSaved);
     }
@@ -74,7 +74,7 @@ public class LessonController {
         var lessonModelUpdate = lessonModelOptional.get();
         BeanUtils.copyProperties(lessonDto, lessonModelUpdate);
         LessonModel lessonModelSaved = lessonService.save(lessonModelUpdate);
-        log.debug("PUT updateLesson lessonModel updated {} ", lessonModelSaved.toString());
+        log.debug("PUT updateLesson lessonId {} ", lessonModelSaved.getLessonId());
         log.info("Lesson updated successfully lessonId {}", lessonModelSaved.getLessonId());
         return ResponseEntity.status(HttpStatus.OK).body(lessonModelSaved);
     }
@@ -94,7 +94,7 @@ public class LessonController {
         if (lessonModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MSG_LESSON_NOT_FOUND_FOR_THIS_MODULE);
         }
-        log.debug("GET getOneLessonForOneModule lessonModel retrieved {} ", lessonModelOptional.get().toString());
+        log.debug("GET getOneLessonForOneModule lessonId retrieved {} ", lessonModelOptional.get().getLessonId());
         return ResponseEntity.status(HttpStatus.OK).body(lessonModelOptional.get());
     }
 }

@@ -46,7 +46,7 @@ public class ModuleController {
         moduleModel.setCreationDate(LocalDateTime.now(ZoneId.of("UTC")));
         moduleModel.setCourse(courseModelOptional.get());
         ModuleModel moduleModelSaved = moduleService.save(moduleModel);
-        log.debug("POST saveModule moduleModel saved {} ", moduleModelSaved.toString());
+        log.debug("POST saveModule moduleId {} ", moduleModelSaved.getModuleId());
         log.info("Module saved successfully moduleId {}", moduleModelSaved.getModuleId());
         return ResponseEntity.status(HttpStatus.CREATED).body(moduleModelSaved);
     }
@@ -74,8 +74,7 @@ public class ModuleController {
         var moduleModelUpdate = moduleModelOptional.get();
         BeanUtils.copyProperties(moduleDto, moduleModelUpdate);
         ModuleModel moduleModelSaved = moduleService.save(moduleModelUpdate);
-        log.debug("PUT updateModule moduleModel updated {} ", moduleModelSaved.toString());
-        log.info("Module updated successfully moduleId {}", moduleModelSaved.getModuleId());
+        log.debug("PUT updateModule moduleId{}", moduleModelSaved.getModuleId());
         return ResponseEntity.status(HttpStatus.OK).body(moduleModelSaved);
     }
 
@@ -94,7 +93,7 @@ public class ModuleController {
         if (moduleModelOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(MSG_MODULE_NOT_FOUND_FOR_THIS_COURSE);
         }
-        log.debug("GET getOneModuleForOneCourse moduleModel retrieved {} ", moduleModelOptional.get().toString());
+        log.debug("GET getOneModuleForOneCourse moduleId {} ", moduleModelOptional.get().getModuleId());
         return ResponseEntity.status(HttpStatus.OK).body(moduleModelOptional.get());
     }
 }
