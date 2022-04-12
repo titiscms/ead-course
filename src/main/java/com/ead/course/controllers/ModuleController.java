@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,6 +35,7 @@ public class ModuleController {
     @Autowired
     private CourseService courseService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping
     public ResponseEntity<Object> saveModule(@PathVariable UUID courseId, @Valid @RequestBody ModuleDto moduleDto) {
         log.debug("POST saveModule moduleDto received {} ", moduleDto.toString());
@@ -51,6 +53,7 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(moduleModelSaved);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping(path = "/{moduleId}")
     public ResponseEntity<Object> deleteModule(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
         log.debug("DELETE deleteModule moduleId received {} ", moduleId);
@@ -64,6 +67,7 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Module deleted successfully!");
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping(path = "/{moduleId}")
     public ResponseEntity<Object> updateModule(@PathVariable UUID courseId, @PathVariable UUID moduleId, @Valid @RequestBody ModuleDto moduleDto) {
         log.debug("PUT updateModule moduleDto {} + moduleId {} received ", moduleDto.toString(), moduleId);
@@ -78,6 +82,7 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(moduleModelSaved);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping
     public ResponseEntity<Page<ModuleModel>> getAllModulesForOneCourse(@PathVariable UUID courseId,
                                                                        SpecificationTemplate.ModuleSpec spec,
@@ -86,6 +91,7 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(moduleModelPage);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping(path = "/{moduleId}")
     public ResponseEntity<Object> getOneModuleForOneCourse(@PathVariable UUID courseId, @PathVariable UUID moduleId) {
         log.debug("GET getOneModuleForOneCourse moduleId received {} ", moduleId);

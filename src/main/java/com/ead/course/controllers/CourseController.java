@@ -1,5 +1,6 @@
 package com.ead.course.controllers;
 
+import com.ead.course.configs.security.UserDetailsImpl;
 import com.ead.course.dtos.CourseDto;
 import com.ead.course.models.CourseModel;
 import com.ead.course.services.CourseService;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,12 +35,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class CourseController {
 
     public static final String MSG_COURSE_NOT_FOUND = "Course not found.";
+
     @Autowired
     private CourseService courseService;
 
     @Autowired
     private CourseValidator courseValidator;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping
     public ResponseEntity<Object> saveCourse(@RequestBody CourseDto courseDto, Errors errors) {
         log.debug("POST saveCourse courseDto received {} ", courseDto.toString());
@@ -55,6 +60,7 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(courseModelSaved);
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping(path = "/{courseId}")
     public ResponseEntity<Object> deleteCourse(@PathVariable UUID courseId) {
         log.debug("DELETE deleteCourse courseId received {} ", courseId);
@@ -68,6 +74,7 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Course deleted successfully!");
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping(path = "/{courseId}")
     public ResponseEntity<Object> updateCourse(@PathVariable UUID courseId, @Valid @RequestBody CourseDto courseDto) {
         log.debug("PUT updateCourse courseDto {} received + courseId {} ", courseDto.toString(), courseId);
@@ -84,10 +91,14 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.OK).body(courseModelSaved);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping
     public ResponseEntity<Page<CourseModel>> getAllCourses(SpecificationTemplate.CourseSpec spec,
                                                            @PageableDefault(page = 0, size = 10, sort = "courseId", direction = Sort.Direction.ASC) Pageable pageable,
-                                                           @RequestParam(required = false) UUID userId) {
+                                                           @RequestParam(required = false) UUID userId,
+                                                           Authentication authentication) {
+        UserDetailsImpl userDetails = (UserDetailsImpl)  authentication.getPrincipal();
+        log.info("Authentication userId: {}", userDetails.getUserId());
         Page<CourseModel> courseModelPage;
         if (userId != null) {
             courseModelPage = courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), pageable);
@@ -102,6 +113,7 @@ public class CourseController {
         return ResponseEntity.status(HttpStatus.OK).body(courseModelPage);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping(path = "/{courseId}")
     public ResponseEntity<Object> getOneCourse(@PathVariable UUID courseId) {
         log.debug("GET getOneCourse courseId received {} ", courseId);
